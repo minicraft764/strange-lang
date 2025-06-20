@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>strange lang - scary_boy963</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: url("SPACE.PNG") no-repeat center center fixed;
+      background-size: cover;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 15px;
+      width: 100%;
+      max-width: 400px;
+    }
+    input, button {
+      font-size: 16px;
+      padding: 10px;
+      border: none;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+    input {
+      width: 100%;
+      max-width: 100%;
+    }
+    button {
+      background-color: black;
+      color: white;
+      cursor: pointer;
+      width: 100%;
+      max-width: 100%;
+    }
+    button:hover {
+      background-color: #333;
+    }
+    #footer {
+      position: fixed;
+      bottom: 10px;
+      width: 100%;
+      text-align: center;
+      font-size: 14px;
+      color: white;
+    }
+    .hidden {
+      display: none;
+    }
+
+    /* For very small phones */
+    @media (max-width: 350px) {
+      input, button {
+        font-size: 14px;
+        padding: 8px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Main Page -->
+    <div id="mainPage">
+      <div class="container">
+        <button onclick="showPage('sendPage')">Send</button>
+        <button onclick="showPage('receivePage')">Received</button>
+        <button onclick="showPage('codePage')">Code</button>
+      </div>
+    </div>
+
+    <!-- Send Page -->
+    <div id="sendPage" class="hidden">
+      <input id="sendInput" placeholder="Enter message to encode"/>
+      <button onclick="encodeMessage()">Send</button>
+      <button onclick="showPage('mainPage')">Back</button>
+    </div>
+
+    <!-- Receive Page -->
+    <div id="receivePage" class="hidden">
+      <input id="receiveInput" placeholder="Paste encoded message"/>
+      <button onclick="decodeMessage()">Receive</button>
+      <button onclick="showPage('mainPage')">Back</button>
+    </div>
+
+    <!-- Code Page -->
+    <div id="codePage" class="hidden">
+      <input id="codeInput" placeholder="4-digit code" maxlength="4" oninput="enforceCodeInput(this)"/>
+      <button onclick="saveCode()">Save</button>
+      <button onclick="showPage('mainPage')">Back</button>
+    </div>
+  </div>
+
+  <div id="footer">Made by: scary_boy963</div>
+
+  <script>
+    let encodingKey = "0000";
+
+    function showPage(pageId) {
+      ['mainPage', 'sendPage', 'receivePage', 'codePage'].forEach(id => {
+        document.getElementById(id).classList.add('hidden');
+      });
+      document.getElementById(pageId).classList.remove('hidden');
+    }
+
+    function encodeMessage() {
+      const message = document.getElementById("sendInput").value;
+      if (!message) {
+        alert("Please enter a message to send.");
+        return;
+      }
+      let encoded = '';
+      for (let i = 0; i < message.length; i++) {
+        const shift = parseInt(encodingKey[i % encodingKey.length]);
+        encoded += String.fromCharCode(message.charCodeAt(i) + shift);
+      }
+      navigator.clipboard.writeText(encoded).then(() => {
+        alert(`Encoded message copied to clipboard:\n${encoded}`);
+      });
+    }
+
+    function decodeMessage() {
+      const encoded = document.getElementById("receiveInput").value;
+      if (!encoded) {
+        alert("Please enter the encoded message.");
+        return;
+      }
+      let decoded = '';
+      for (let i = 0; i < encoded.length; i++) {
+        const shift = parseInt(encodingKey[i % encodingKey.length]);
+        decoded += String.fromCharCode(encoded.charCodeAt(i) - shift);
+      }
+      alert(`Decoded message:\n${decoded}`);
+    }
+
+    function enforceCodeInput(input) {
+      input.value = input.value.replace(/[^0-9]/g, "").slice(0, 4);
+    }
+
+    function saveCode() {
+      const newCode = document.getElementById("codeInput").value;
+      if (newCode.length === 4) {
+        encodingKey = newCode;
+        alert(`New encoding key saved: ${encodingKey}`);
+        showPage('mainPage');
+      } else {
+        alert("Please enter exactly 4 digits.");
+      }
+    }
+  </script>
+</body>
+</html>
